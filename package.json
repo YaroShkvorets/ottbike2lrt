@@ -1,0 +1,25 @@
+{
+  "name": "maps.bikeottawa.ca-backend",
+  "description": "OSRM and isochrone servers for maps.bikeottawa.ca",
+  "version": "5.15.1",
+  "license": "MIT",
+  "maintainers": [
+    {
+      "name": "Yaro Shkvorets",
+      "email": "shkvorets@gmail.com",
+      "web": "bikeottawa.ca"
+    }
+  ],
+  "dependencies": {
+    "isochrone": "^2.0.2",
+    "osrm": "5.15.1",
+    "minimist": "^1.2.0",
+    "log4js": "^2.5.3"
+  },
+  "repositories": [
+    {
+      "type": "git",
+      "url": "git://github.com/BikeOttawa/maps.bikeottawa.ca-backend.git"
+    }
+  ]
+}
