@@ -1,6 +1,6 @@
 {
-  "name": "maps.bikeottawa.ca-backend",
-  "description": "OSRM and isochrone servers for maps.bikeottawa.ca",
+  "name": "ottbike2LRT",
+  "description": "Bike isochrones for LRT stations",
   "version": "5.15.1",
   "license": "MIT",
   "maintainers": [
@@ -11,15 +11,14 @@
     }
   ],
   "dependencies": {
-    "isochrone": "^2.0.2",
-    "osrm": "5.15.1",
-    "minimist": "^1.2.0",
-    "log4js": "^2.5.3"
+    "@turf/turf": "^5.1.6",
+    "geojson-writer": "0.3.6",
+    "axios": "^0.18.0"
   },
   "repositories": [
     {
       "type": "git",
-      "url": "git://github.com/BikeOttawa/maps.bikeottawa.ca-backend.git"
+      "url": "git://github.com/zzptichka/ottbike2LRT"
     }
   ]
 }

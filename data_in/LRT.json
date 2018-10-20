@@ -1,0 +1,46 @@
+
+{
+    "type": "FeatureCollection",
+    "generator": "JOSM",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Pimisi"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -75.71299911082,
+                    45.41382374452
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Bayview"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -75.72169482976,
+                    45.40968506380
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Tunney's Pasture"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -75.73501736194,
+                    45.40363466593
+                ]
+            }
+        }
+    ]
+}
