@@ -1,10 +1,10 @@
 //build.js - builds isochrones for files in files array
-const fs = require('fs');
+const fs = require('fs')
 const reader = require('geojson-writer').reader
-const turf = require("@turf/turf");
-const Axios = require('axios');
+const turf = require("@turf/turf")
+const Axios = require('axios')
 
-const files = ['Confederation Line phase 1'];
+const files = ['Confederation Line phase 1']
 
 const params = {
           lng: 0,
@@ -17,39 +17,37 @@ const params = {
           intervals: [3, 6, 9],
           cellSize: 0.2,
           dir: ''
-        };
+        }
+const levels = ['lts2','lts3','lts4']
 
-let places = reader(`data_in/${files[0]}.json`)
-console.log(`*** Processing file: ${files[0]}.json ***`);
+files.forEach(filename => {
+  console.log(`*** Processing file: ${filename}.json ***`);
+  let places = reader(`data_in/${filename}.json`)
 
-['lts2','lts3','lts4'].map(lts => {
-  const result = turf.featureCollection([]);
-  params.dir = lts
+  levels.forEach(lts => {
+    const result = turf.featureCollection([]);
+    params.dir = lts
 
-  const promises = places.features.map(async place => {
+    const promises = places.features.map(async ({properties, geometry}) => {
 
-    console.log(`Processing ${place.properties.name} at LTS ${lts}`);
-    params.lng = place.geometry.coordinates[0]
-    params.lat = place.geometry.coordinates[1]
+      console.log(`Processing ${properties.name} at LTS ${lts}`);
+      params.lng = geometry.coordinates[0]
+      params.lat = geometry.coordinates[1]
 
-    let url = 'https://maps.bikeottawa.ca:3000/?';
-    Object.keys(params).forEach(key => url+=key+'='+params[key]+'&');
-    Object.keys(params.intervals).forEach(i => url+='intervals='+params.intervals[i]+'&');
+      let url = 'https://maps.bikeottawa.ca:3000/?';
+      Object.keys(params).forEach(key => url+=`${key}=${params[key]}&`);
+      Object.keys(params.intervals).forEach(i => url+=`intervals=${params.intervals[i]}&`);
 
-    const response = await Axios({
-       method: 'GET',
-       url: url,
-       json: true,
-       headers: {
-         Accept: 'application/vnd.github.v3+json',
-         'User-Agent': 'Axios'
-       }
-     })
-     result.features = result.features.concat(response.data.features);
-  });
+      const response = await Axios({
+         url: url,
+         headers: {'User-Agent': 'Axios'}
+       })
+       result.features = result.features.concat(response.data.features);
+    });
 
-  Promise.all(promises).then(()=>{
+    Promise.all(promises).then(()=>{
 
-    fs.writeFileSync(`data_out/${files[0]}-${lts}.json`, JSON.stringify(result, null, 2));
+      fs.writeFileSync(`data_out/${filename}-${lts}.json`, JSON.stringify(result, null, 2));
+    });
   });
 });
