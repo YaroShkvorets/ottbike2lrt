@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-138320' action='modify' visible='true' lat='45.40930187139' lon='-75.72219640151'>
+    <tag k='name' v='Bayview' />
+  </node>
+  <node id='-138327' action='modify' visible='true' lat='45.4037608402' lon='-75.73514610797'>
+    <tag k='name' v='Tunney&apos;s Pasture' />
+  </node>
+  <node id='-138334' action='modify' visible='true' lat='45.41376349295' lon='-75.71319759429'>
+    <tag k='name' v='Pimisi' />
+  </node>
+  <node id='-138341' action='modify' visible='true' lat='45.41875285796' lon='-75.70488274634'>
+    <tag k='name' v='Lyon' />
+  </node>
+  <node id='-138348' action='modify' visible='true' lat='45.42139987035' lon='-75.69872976422'>
+    <tag k='name' v='Parliament' />
+  </node>
+  <node id='-138355' action='modify' visible='true' lat='45.42548497774' lon='-75.69312394202'>
+    <tag k='name' v='Rideau' />
+  </node>
+  <node id='-138362' action='modify' visible='true' lat='45.4206731753' lon='-75.68245411456'>
+    <tag k='name' v='uOttawa' />
+  </node>
+  <node id='-138369' action='modify' visible='true' lat='45.41641450102' lon='-75.67036808074'>
+    <tag k='name' v='Lees' />
+  </node>
+  <node id='-138376' action='modify' visible='true' lat='45.41229484117' lon='-75.66451013625'>
+    <tag k='name' v='Hurdman' />
+  </node>
+  <node id='-138383' action='modify' visible='true' lat='45.41692661701' lon='-75.65332533002'>
+    <tag k='name' v='Tremblay' />
+  </node>
+  <node id='-138390' action='modify' visible='true' lat='45.4206694138' lon='-75.63733936429'>
+    <tag k='name' v='St-Laurent' />
+  </node>
+  <node id='-138397' action='modify' visible='true' lat='45.42273650231' lon='-75.62640667498'>
+    <tag k='name' v='Cyrville' />
+  </node>
+  <node id='-138404' action='modify' visible='true' lat='45.43111329094' lon='-75.60833932042'>
+    <tag k='name' v='Blair' />
+  </node>
+</osm>

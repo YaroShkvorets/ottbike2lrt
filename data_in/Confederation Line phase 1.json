@@ -1,0 +1,176 @@
+
+{
+    "type": "FeatureCollection",
+    "generator": "JOSM",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Bayview"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -75.72219640151,
+                    45.40930187139
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Tunney's Pasture"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -75.73514610797,
+                    45.40376084020
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Pimisi"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -75.71319759429,
+                    45.41376349295
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Lyon"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -75.70488274634,
+                    45.41875285796
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Hurdman"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -75.66451013625,
+                    45.41229484117
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Parliament"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -75.69872976422,
+                    45.42139987035
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Rideau"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -75.69312394202,
+                    45.42548497774
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "uOttawa"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -75.68245411456,
+                    45.42067317530
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Lees"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -75.67036808074,
+                    45.41641450102
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Tremblay"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -75.65332533002,
+                    45.41692661701
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "St-Laurent"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -75.63733936429,
+                    45.42066941380
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Cyrville"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -75.62640667498,
+                    45.42273650231
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Blair"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -75.60833932042,
+                    45.43111329094
+                ]
+            }
+        }
+    ]
+}
