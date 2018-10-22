@@ -14,18 +14,18 @@ const params = {
           concavity: 2,
           lengthThreshold: 0,
           units: 'kilometers',
-          intervals: [3, 6, 9],
+          intervals: [3, 6, 9, 12, 15],
           cellSize: 0.2,
           dir: ''
         }
-const levels = ['lts2','lts3','lts4']
+const levels = ['lts1','lts2','lts3','lts4']
 
 files.forEach(filename => {
   console.log(`*** Processing file: ${filename}.json ***`);
   let places = reader(`data_in/${filename}.json`)
 
+  const result = turf.featureCollection([]);
   levels.forEach(lts => {
-    const result = turf.featureCollection([]);
     params.dir = lts
 
     const promises = places.features.map(async ({properties, geometry}) => {
@@ -42,14 +42,15 @@ files.forEach(filename => {
          url: url,
          headers: {'User-Agent': 'Axios'}
        })
-       if(response.data.features.length==0) {return;}
+       if(response.data.error || response.data.features.length==0) {return;}
        response.data.features.forEach(f => f.properties['name'] = properties.name)
+       response.data.features.forEach(f => f.properties['lts'] = lts)
        result.features = result.features.concat(response.data.features);
     });
 
     Promise.all(promises).then(()=>{
 
-      fs.writeFileSync(`data_out/${filename}-${lts}.json`, JSON.stringify(result, null, 2));
+      fs.writeFileSync(`data_out/${filename}-lts.json`, JSON.stringify(result, null, 2));
     });
   });
 });
