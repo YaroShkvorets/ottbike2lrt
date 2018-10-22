@@ -42,6 +42,8 @@ files.forEach(filename => {
          url: url,
          headers: {'User-Agent': 'Axios'}
        })
+       if(response.data.features.length==0) {return;}
+       response.data.features.forEach(f => f.properties['name'] = properties.name)
        result.features = result.features.concat(response.data.features);
     });
 
