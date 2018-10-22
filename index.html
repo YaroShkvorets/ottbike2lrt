@@ -56,18 +56,18 @@
           <label for='lts4' >LTS-4</label>
         </div><br><br>
         <h5>Travel time</h5>
-        <fieldset class='intervals checkbox-pill clearfix '>
-          <input type='checkbox' id='i3' checked='checked' value=3>
-          <label for='i3' class='button icon check quiet'>3m</label>
-          <input type='checkbox' id='i6' checked='checked' value=6>
-          <label for='i6' class='button icon check quiet'>6m</label>
-          <input type='checkbox' id='i9' checked='checked' value=9>
-          <label for='i9' class='button icon check quiet'>9m</label>
-          <input type='checkbox' id='i12' checked='checked' value=12>
-          <label for='i12' class='button icon check quiet'>12m</label>
-          <input type='checkbox' id='i15' checked='checked' value=15>
-          <label for='i15' class='button icon check quiet'>15m</label>
-        </fieldset>
+        <div class='rounded-toggle inline '>
+          <input type='radio' name='i_radios' id='i3' value=3>
+          <label for='i3' >3m</label>
+          <input type='radio' name='i_radios' id='i6' value=6>
+          <label for='i6'>6m</label>
+          <input type='radio' name='i_radios' id='i9' value=9>
+          <label for='i9' >9m</label>
+          <input type='radio' name='i_radios' id='i12' value=12>
+          <label for='i12' >12m</label>
+          <input type='radio' name='i_radios' id='i15' value=15>
+          <label for='i15' >15m</label>
+        </div><br><br>
         <h5>Street legend</h5>
         <fieldset class='checkbox-pill clearfix '>
           <input type='checkbox' id='legend-lts1'>
@@ -270,15 +270,12 @@
 
       map.on('click', function(e) {
           var features = map.queryRenderedFeatures(e.point, {
-                layers: ['i3','i6','i9']  //todo: map from isochroneLayers, i.e. isochroneLayers.map(l=>'i'+l.time)
+                layers: isochroneLayers.map(l=>'i'+l.time) //todo: map from isochroneLayers, i.e. isochroneLayers.map(l=>'i'+l.time)
             });
-          var features1 = map.querySourceFeatures('isochrones', {
-                filter: [
-                  'all',
-                  ['==', '$type', 'Point'],
-                //  ['<=', 'time', layer.time]
-                ]
-            });
+          if(features.length){
+            const stations = [ ...new Set(features.map(f=>f.properties.name)) ]
+            console.log('Stations: '+stations)
+          }
           fetchRoute(e.lngLat)
       });
 
@@ -372,7 +369,8 @@
       }
 
       function toggleIsochrone(checkbox){
-        map.setLayoutProperty(checkbox.currentTarget.id, 'visibility', checkbox.currentTarget.checked?'visible':'none');
+        const radios = document.getElementsByName('i_radios')
+        radios.forEach(checkbox => map.setLayoutProperty(checkbox.id, 'visibility', checkbox.checked?'visible':'none'))
       }
 
       document.getElementById('lts1').onchange = fetchIsochrones
