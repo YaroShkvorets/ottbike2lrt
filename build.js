@@ -4,7 +4,7 @@ const reader = require('geojson-writer').reader
 const turf = require("@turf/turf")
 const Axios = require('axios')
 
-const files = ['Confederation Line phase 1']
+const files = ['OttLRTphase1']
 
 const params = {
           lng: 0,
@@ -28,11 +28,12 @@ files.forEach(filename => {
   levels.forEach(lts => {
     params.dir = lts
 
-    const promises = places.features.map(async ({properties, geometry}) => {
+    const promises = places.features.map(async place => {
 
-      console.log(`Processing ${properties.name} at LTS ${lts}`);
-      params.lng = geometry.coordinates[0]
-      params.lat = geometry.coordinates[1]
+      console.log(`Processing ${place.properties.name} at LTS ${lts}`);
+      result.features.push(place)
+      params.lng = place.geometry.coordinates[0]
+      params.lat = place.geometry.coordinates[1]
 
       let url = 'https://maps.bikeottawa.ca:3000/?';
       Object.keys(params).forEach(key => url+=`${key}=${params[key]}&`);
@@ -43,9 +44,9 @@ files.forEach(filename => {
          headers: {'User-Agent': 'Axios'}
        })
        if(response.data.error || response.data.features.length==0) {return;}
-       response.data.features.forEach(f => f.properties['name'] = properties.name)
+       response.data.features.forEach(f => f.properties['name'] = place.properties.name)
        response.data.features.forEach(f => f.properties['lts'] = lts)
-       result.features = result.features.concat(response.data.features);
+       result.features = result.features.concat(response.data.features.filter(feature => feature.geometry.type=='Polygon'));
     });
 
     Promise.all(promises).then(()=>{

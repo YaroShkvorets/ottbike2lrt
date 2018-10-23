@@ -81,9 +81,9 @@
         </fieldset>
       </form>
       <div class='center pad2'>
-        <a href='https://bikeottawa.ca'><img src="../img/logos/bikeottawa.png" style="width:32px; height:32px;"></a>
-        <a href='https://github.com/BikeOttawa/maps.bikeottawa.ca-frontend'><img src="../img/logos/github.png" style="width:32px; height:32px;"></a>
-        <a href='https://twitter.com/BikeOttawa'><img src="../img/logos/twitter.png" style="width:32px; height:32px;">  </a>
+        <a href='https://bikeottawa.ca'><img src="https://maps.bikeottawa.ca/img/logos/bikeottawa.png" style="width:32px; height:32px;"></a>
+        <a href='https://github.com/BikeOttawa/maps.bikeottawa.ca-frontend'><img src="https://maps.bikeottawa.ca/img/logos/github.png" style="width:32px; height:32px;"></a>
+        <a href='https://twitter.com/BikeOttawa'><img src="https://maps.bikeottawa.ca/img/logos/twitter.png" style="width:32px; height:32px;">  </a>
       </div>
     </div>
   </div>
@@ -122,19 +122,8 @@
     map.addControl(new mapboxgl.NavigationControl(),'bottom-right');
 
 
-    var canvas = map.getCanvasContainer();
 
-    var point = {
-        "type": "FeatureCollection",
-        "features": [{
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [-75.697927,45.417431]
-            }
-        }]
-    };
-    var routePoint = {
+    var routeFromJson = {
         "type": "Feature",
         "properties":{title:'N/A'},
         "geometry": {
@@ -142,25 +131,13 @@
             "coordinates": [0,0]
         }
     };
-    var routeLine = {
-        "type": "Feature",
-        "properties":{title:'N/A'},
-        "geometry": {
-            "type": "LineString",
-            "coordinates": [[0,0]]
-        }
 
+    var routeLinesJson = {
+      "type": "FeatureCollection",
+      "features": []
     };
 
-    /*var isochroneLayers = [
-          {time:15, color:'#C8D9EA', opacity:1},
-          {time:12, color:'#96B8E6', opacity:1},
-          {time:9, color:'#6497E2', opacity:1},
-          {time:6, color:'#3276DE', opacity:1},
-          {time:3, color:'#0055DB', opacity:1},
-          {time:0, color:'#ff9933', opacity:1}
-        ];*/
-    var isochroneLayers = [
+    const isochroneLayers = [
           {time:15, color:'#C8D9EA', opacity:1},
           {time:12, color:'#96B8E6', opacity:1},
           {time:9, color:'#6497E2', opacity:1},
@@ -168,7 +145,7 @@
           {time:3, color:'#0055DB', opacity:1},
           {time:0, color:'#ff9933', opacity:1}
         ];
-    var ltsLayers = [
+    const ltsLayers = [
           {id:"legend-lts1", name:'LTS 1 - Suitable for children', color:'#0099cc', opacity:0.9, tileset:'mapbox://bikeottawa.7gev94ax', layer:'7gev94ax'},
           {id:"legend-lts2", name:'LTS-2 - Low stress', color:'#1C7C54', opacity:0.9, tileset:'mapbox://bikeottawa.2p4cgvm3', layer:'2p4cgvm3'},
           {id:"legend-lts3", name:'LTS-3 - Medium stress', color:'#F0C808', opacity:0.9, tileset:'mapbox://bikeottawa.42dlr9v2', layer:'42dlr9v2'},
@@ -178,10 +155,6 @@
     map.on('style.load', function () {
 
 
-      map.addSource('point', {
-          "type": "geojson",
-          "data": point
-      });
 
       ltsLayers.forEach(function (layer, i) {
 
@@ -207,11 +180,11 @@
       });
 
 
-      map.addSource('route', { type: 'geojson' , data: routeLine});
+      map.addSource('routes', { type: 'geojson' , data: routeLinesJson});
       map.addLayer({
-         "id": "route",
+         "id": "routes",
          "type": "line",
-         "source": 'route',
+         "source": 'routes',
          "layout":{
              "line-cap": "round"
          },
@@ -221,35 +194,23 @@
              "line-opacity": 1
          }
       });
-      map.addSource('route-point', { type: 'geojson' , data: routePoint});
+      map.addSource('routeFrom', { type: 'geojson' , data: routeFromJson});
       map.addLayer({
-          "id": "route-point",
+          "id": "routeFrom",
           "type": "circle",
-          "source": "route-point",
+          "source": "routeFrom",
           "paint": {
               "circle-radius": 5,
               "circle-color": "#333"
           }
       });
-      map.addLayer({
-          "id": "route-label",
-          "type": "symbol",
-          "source": "route-point",
-          "layout": {
-              "text-field": '{title}',
-              "text-size": 14,
-              "text-offset": [0,-2]
-          },
-          "paint": {
-            "text-halo-color": "#fff",
-            "text-halo-width": 2
-          }
-      });
+
 
       map.addSource('isochrones', {
         type: 'geojson',
-        data: 'http://localhost:8080/data_out/test.json'
+        data: 'http://localhost:8080/data_out/OttLRTphase1-lts.json'
       });
+
 
       isochroneLayers.forEach(function (layer, i) {
 
@@ -270,23 +231,91 @@
         }, 'road-path');
       });
 
-      map.on('click', function(e) {
-          var features = map.queryRenderedFeatures(e.point, {
-                layers: isochroneLayers.map(l=>'i'+l.time) //todo: map from isochroneLayers, i.e. isochroneLayers.map(l=>'i'+l.time)
-            });
-          if(features.length){
-            const stations = [ ...new Set(features.map(f=>f.properties.name)) ]
-            console.log('Stations: '+stations)
+      map.addLayer({
+        'id': 'destinations',
+        'type': 'circle',
+        'source': 'isochrones',
+        'paint': {
+            'circle-radius': 8,
+            'circle-color': '#333'
+        },
+        'filter': [
+          'all',
+          ['==', '$type', 'Point']
+        ]
+      }, 'road-path');
+
+      map.addLayer({
+          "id": "destinations-label",
+          "type": "symbol",
+          "source": "isochrones",
+          "layout": {
+              "text-field": '{name}',
+              "text-size": 18,
+              "text-offset": [0,-2]
+          },
+          "paint": {
+            "text-halo-color": "#fff",
+            "text-halo-width": 1,
+            "text-color": "#ff140f"
+          },
+          'filter': [
+            'all',
+            ['==', '$type', 'Point']
+          ]
+      });
+
+      map.addLayer({
+          "id": "route-label",
+          "type": "symbol",
+          "source": "routes",
+          "layout": {
+              "text-field": '{title}',
+              "text-size": 12,
+              "text-offset": [2,0]
+          },
+          "paint": {
+            "text-halo-color": "#fff",
+            "text-halo-width": 2
           }
-          fetchRoute(e.lngLat)
+      });
+
+      map.on('click', function(e) {
+
+        routeLinesJson.features = []
+        routeFromJson.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat]
+        map.getSource('routeFrom').setData(routeFromJson)
+
+        const features = map.queryRenderedFeatures(e.point, {
+              layers: isochroneLayers.map(l=>'i'+l.time)
+          });
+        if(features.length){
+          const stations = [ ...new Set(features.map(f=>f.properties.name)) ]
+          console.log('Stations: '+stations)
+          stations.forEach(station_name => {
+            const stations = map.querySourceFeatures('isochrones', {
+                            sourceLayer: 'destinations',
+                            'filter': [
+                              'all',
+                              ['==', 'name', station_name],
+                              ['==', '$type', 'Point']
+                            ]
+                          })
+            if(stations.length==0) return;
+            fetchRoute({lat:stations[0].geometry.coordinates[1],lng:stations[0].geometry.coordinates[0]})
+
+          });
+        }
+
       });
 
 
-      const request = new XMLHttpRequest();
+
 
       function fetchRoute(lngLat) {
-        const query = encodeURIComponent([point.features[0].geometry.coordinates.join(','),[lngLat.lng, lngLat.lat].join(',')].join(';'));
+        const query = encodeURIComponent([routeFromJson.geometry.coordinates.join(','),[lngLat.lng, lngLat.lat].join(',')].join(';'));
         const api = "https://maps.bikeottawa.ca/route/v1/"+document.querySelector('input[name=lts_radios]:checked').value
+        const request = new XMLHttpRequest();
         request.abort();
         request.open('GET', api + '/'+ query + '?alternatives=false&steps=true&geometries=geojson', true);
         request.onload = function () {
@@ -298,11 +327,11 @@
             }
 
             if (data.routes[0]){
-              routeLine.geometry.coordinates = data.routes[0].geometry.coordinates
-              map.getSource('route').setData(routeLine);
-              routePoint.geometry.coordinates = data.waypoints[data.waypoints.length - 1].location
-              routePoint.properties.title = buildTitle(data.routes[0].duration, data.routes[0].distance)
-              map.getSource('route-point').setData(routePoint)
+              data.routes[0]['properties'] = {title:buildTitle(data.routes[0].duration, data.routes[0].distance)}
+              data.routes[0].geometry.coordinates.reverse()
+              routeLinesJson.features.push(data.routes[0])
+              map.getSource('routes').setData(routeLinesJson);
+
             }
           } else {
             return
@@ -322,6 +351,10 @@
       }
 
       function toggleIsochrones() {
+
+        routeLinesJson.features = []
+        map.getSource('routes').setData(routeLinesJson);
+
         const lts = document.querySelector('input[name=lts_radios]:checked').value
 
         isochroneLayers.forEach((layer, i) => {
@@ -342,6 +375,7 @@
       }
 
       function toggleIsochrone(checkbox){
+
         const radios = document.getElementsByName('i_radios')
         radios.forEach(checkbox => map.setLayoutProperty(checkbox.id, 'visibility', checkbox.checked?'visible':'none'))
       }
