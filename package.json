@@ -12,8 +12,9 @@
   ],
   "dependencies": {
     "@turf/turf": "^5.1.6",
-    "geojson-writer": "0.3.6",
-    "axios": "^0.18.0"
+    "await-semaphore": "^0.1.3",
+    "axios": "^0.18.0",
+    "geojson-writer": "0.3.6"
   },
   "repositories": [
     {

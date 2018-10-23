@@ -3,22 +3,24 @@ const fs = require('fs')
 const reader = require('geojson-writer').reader
 const turf = require("@turf/turf")
 const Axios = require('axios')
+const Semaphore = require('await-semaphore').Semaphore
 
 const files = ['OttLRTphase1']
 
 const params = {
           lng: 0,
           lat: 0,
-          radius: 3,
-          deintersect: 'true',
+          radius: 4,
+          deintersect: 'false',
           concavity: 2,
           lengthThreshold: 0,
           units: 'kilometers',
-          intervals: [3, 6, 9, 12, 15],
+          intervals: [3,6,9,12,15],
           cellSize: 0.2,
           dir: ''
         }
-const levels = ['lts1','lts2','lts3','lts4']
+const levels = ['lts2','lts3','lts4']
+const semaphore = new Semaphore(5)  //5 requests at a time
 
 files.forEach(filename => {
   console.log(`*** Processing file: ${filename}.json ***`);
@@ -30,7 +32,6 @@ files.forEach(filename => {
 
     const promises = places.features.map(async place => {
 
-      console.log(`Processing ${place.properties.name} at LTS ${lts}`);
       result.features.push(place)
       params.lng = place.geometry.coordinates[0]
       params.lat = place.geometry.coordinates[1]
@@ -39,14 +40,20 @@ files.forEach(filename => {
       Object.keys(params).forEach(key => url+=`${key}=${params[key]}&`);
       Object.keys(params.intervals).forEach(i => url+=`intervals=${params.intervals[i]}&`);
 
+      const release = await semaphore.acquire();
+      console.log(`Processing ${place.properties.name} at LTS ${lts}`);
       const response = await Axios({
          url: url,
          headers: {'User-Agent': 'Axios'}
        })
+       release();
        if(response.data.error || response.data.features.length==0) {return;}
-       response.data.features.forEach(f => f.properties['name'] = place.properties.name)
-       response.data.features.forEach(f => f.properties['lts'] = lts)
-       result.features = result.features.concat(response.data.features.filter(feature => feature.geometry.type=='Polygon'));
+       response.data.features.forEach(f => {
+         if(f!=null) {
+           f.properties = {name:place.properties.name, lts:lts, time:f.properties.time}
+         }
+       })
+       result.features = result.features.concat(response.data.features.filter(f => f && f.geometry.type=='Polygon'));
     });
 
     Promise.all(promises).then(()=>{
