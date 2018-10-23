@@ -16,11 +16,11 @@ const params = {
           lengthThreshold: 0,
           units: 'kilometers',
           intervals: [3,6,9,12,15],
-          cellSize: 0.2,
+          cellSize: 0.1,
           dir: ''
         }
-const levels = ['lts2','lts3','lts4']
-const semaphore = new Semaphore(5)  //5 requests at a time
+const levels = ['lts1','lts2','lts3','lts4']
+const semaphore = new Semaphore(1)  //5 requests at a time
 
 files.forEach(filename => {
   console.log(`*** Processing file: ${filename}.json ***`);
@@ -42,12 +42,14 @@ files.forEach(filename => {
 
       const release = await semaphore.acquire();
       console.log(`Processing ${place.properties.name} at LTS ${lts}`);
+      let failed = false
       const response = await Axios({
          url: url,
          headers: {'User-Agent': 'Axios'}
        })
+       .catch(error =>{ console.log(`Axios errored for ${place.properties.name} on url: ${url}. ${error}`); failed=true});
        release();
-       if(response.data.error || response.data.features.length==0) {return;}
+       if(failed || response.data.error || response.data.features.length==0) {return;}
        response.data.features.forEach(f => {
          if(f!=null) {
            f.properties = {name:place.properties.name, lts:lts, time:f.properties.time}

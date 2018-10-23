@@ -23,7 +23,7 @@
 </head>
 <body>
   <div id='app' class='col12 contain clip'>
-    <div id='map'></div>
+    <div id='map' class='loading'></div>
     <div id='error' class='note error contain col8 margin2 hidden pad2'>
       <h3>Error</h3>
       <p>Something went wrong. Either our server didn't respond or the request was blocked by your browser. <br>Please refresh the page and <a target="_blank" href="https://bikeottawa.ca/index.php/about-bike-ottawa/contact-us">contact Bike Ottawa</a> if this error doesn't go away.</p>
@@ -245,7 +245,9 @@
           'source': 'isochrones',
           'paint': {
               'circle-radius': 8,
-              'circle-color': '#333'
+              'circle-color': '#ef271b',
+              'circle-stroke-width': 1,
+              'circle-stroke-color': '#fff'
           },
           'filter': [
             'all',
@@ -265,7 +267,7 @@
             "paint": {
               "text-halo-color": "#fff",
               "text-halo-width": 1,
-              "text-color": "#ff140f"
+              "text-color": "#ef271b"
             },
             'filter': [
               'all',
@@ -287,6 +289,8 @@
               "text-halo-width": 2
             }
         });
+
+        mapEl.classList.remove('loading');
 
         map.on('click', function(e) {
 
@@ -358,7 +362,7 @@
           return ret
         }
 
-        function toggleIsochrones() {
+        function toggleLTS() {
 
           routeLinesJson.features = []
           map.getSource('routes').setData(routeLinesJson);
@@ -388,10 +392,10 @@
           radios.forEach(checkbox => map.setLayoutProperty(checkbox.id, 'visibility', checkbox.checked?'visible':'none'))
         }
 
-        document.getElementById('lts1').onchange = toggleIsochrones
-        document.getElementById('lts2').onchange = toggleIsochrones
-        document.getElementById('lts3').onchange = toggleIsochrones
-        document.getElementById('lts4').onchange = toggleIsochrones
+        document.getElementById('lts1').onchange = toggleLTS
+        document.getElementById('lts2').onchange = toggleLTS
+        document.getElementById('lts3').onchange = toggleLTS
+        document.getElementById('lts4').onchange = toggleLTS
         document.getElementById('legend-lts1').onclick = toggleLayer
         document.getElementById('legend-lts2').onclick = toggleLayer
         document.getElementById('legend-lts3').onclick = toggleLayer
@@ -401,7 +405,6 @@
         document.getElementById('i9').onchange = toggleIsochrone
         document.getElementById('i12').onchange = toggleIsochrone
         document.getElementById('i15').onchange = toggleIsochrone
-
 
       });
     });
