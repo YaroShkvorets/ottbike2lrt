@@ -153,250 +153,258 @@
         ];
 
     map.on('style.load', function () {
+      map.loadImage("bike-icon.png", function(error, image) {
+        if (error) throw error;
+        map.addImage("custom-marker", image);
 
 
 
-      ltsLayers.forEach(function (layer, i) {
+        ltsLayers.forEach(function (layer, i) {
 
-        map.addLayer({
-          "id": layer.id,
-          "type": "line",
-          "source": {
-              type: 'vector',
-              url: layer.tileset,
-          },
-          "source-layer": layer.layer,
-          "layout": {
-              "line-join": "round",
-              "line-cap": "round"
-          },
-          "paint": {
-              "line-color": layer.color,
-              "line-width": 2
-          }
+          map.addLayer({
+            "id": layer.id,
+            "type": "line",
+            "source": {
+                type: 'vector',
+                url: layer.tileset,
+            },
+            "source-layer": layer.layer,
+            "layout": {
+                "line-join": "round",
+                "line-cap": "round"
+            },
+            "paint": {
+                "line-color": layer.color,
+                "line-width": 2
+            }
+          });
+          map.setLayoutProperty(layer.id, 'visibility', 'none');
+          document.getElementById(layer.id+'-label').innerHTML = '<span style="display: inline-block;width:50px; height:8px;background-color: '+layer.color+'"></span>&nbsp;'+layer.name;
         });
-        map.setLayoutProperty(layer.id, 'visibility', 'none');
-        document.getElementById(layer.id+'-label').innerHTML = '<span style="display: inline-block;width:50px; height:8px;background-color: '+layer.color+'"></span>&nbsp;'+layer.name;
-      });
 
 
-      map.addSource('routes', { type: 'geojson' , data: routeLinesJson});
-      map.addLayer({
-         "id": "routes",
-         "type": "line",
-         "source": 'routes',
-         "layout":{
-             "line-cap": "round"
-         },
-         "paint": {
-             "line-color": "#333",
-             "line-width": 3,
-             "line-opacity": 1
-         }
-      });
-      map.addSource('routeFrom', { type: 'geojson' , data: routeFromJson});
-      map.addLayer({
-          "id": "routeFrom",
-          "type": "circle",
-          "source": "routeFrom",
-          "paint": {
-              "circle-radius": 5,
-              "circle-color": "#333"
-          }
-      });
+        map.addSource('routes', { type: 'geojson' , data: routeLinesJson});
+        map.addLayer({
+           "id": "routes",
+           "type": "line",
+           "source": 'routes',
+           "layout":{
+               "line-cap": "round"
+           },
+           "paint": {
+               "line-color": "#333",
+               "line-width": 3,
+               "line-opacity": 1
+           }
+        });
+        map.addSource('routeFrom', { type: 'geojson' , data: routeFromJson});
+        map.addLayer({
+            "id": "routeFrom",
+            //"type": "circle",
+            "type": "symbol",
+            "source": "routeFrom",
+            /*"paint": {
+                "circle-radius": 5,
+                "circle-color": "#333"
+            }*/
+            "layout": {
+               "icon-image": "custom-marker",
+               "icon-size": 0.75
+           }
+        });
 
 
-      map.addSource('isochrones', {
-        type: 'geojson',
-        data: 'http://localhost:8080/data_out/OttLRTphase1-lts.json'
-      });
+        map.addSource('isochrones', {
+          type: 'geojson',
+          data: 'http://localhost:8080/data_out/OttLRTphase1-lts.json'
+        });
 
 
-      isochroneLayers.forEach(function (layer, i) {
+        isochroneLayers.forEach(function (layer, i) {
+
+          map.addLayer({
+            'id': 'i' + layer.time,
+            'type': 'fill',
+            'source': 'isochrones',
+            'layout': {},
+            'paint': {
+              'fill-color': layer.color,
+              'fill-opacity': layer.opacity
+            },
+            'filter': [
+              'all',
+              ['==', '$type', 'Polygon'],
+              ['<=', 'time', layer.time]
+            ]
+          }, 'road-path');
+        });
 
         map.addLayer({
-          'id': 'i' + layer.time,
-          'type': 'fill',
+          'id': 'destinations',
+          'type': 'circle',
           'source': 'isochrones',
-          'layout': {},
           'paint': {
-            'fill-color': layer.color,
-            'fill-opacity': layer.opacity
-          },
-          'filter': [
-            'all',
-            ['==', '$type', 'Polygon'],
-            ['<=', 'time', layer.time]
-          ]
-        }, 'road-path');
-      });
-
-      map.addLayer({
-        'id': 'destinations',
-        'type': 'circle',
-        'source': 'isochrones',
-        'paint': {
-            'circle-radius': 8,
-            'circle-color': '#333'
-        },
-        'filter': [
-          'all',
-          ['==', '$type', 'Point']
-        ]
-      }, 'road-path');
-
-      map.addLayer({
-          "id": "destinations-label",
-          "type": "symbol",
-          "source": "isochrones",
-          "layout": {
-              "text-field": '{name}',
-              "text-size": 18,
-              "text-offset": [0,-2]
-          },
-          "paint": {
-            "text-halo-color": "#fff",
-            "text-halo-width": 1,
-            "text-color": "#ff140f"
+              'circle-radius': 8,
+              'circle-color': '#333'
           },
           'filter': [
             'all',
             ['==', '$type', 'Point']
           ]
-      });
+        }, 'road-path');
 
-      map.addLayer({
-          "id": "route-label",
-          "type": "symbol",
-          "source": "routes",
-          "layout": {
-              "text-field": '{title}',
-              "text-size": 12,
-              "text-offset": [2,0]
-          },
-          "paint": {
-            "text-halo-color": "#fff",
-            "text-halo-width": 2
+        map.addLayer({
+            "id": "destinations-label",
+            "type": "symbol",
+            "source": "isochrones",
+            "layout": {
+                "text-field": '{name}',
+                "text-size": 18,
+                "text-offset": [0,-2]
+            },
+            "paint": {
+              "text-halo-color": "#fff",
+              "text-halo-width": 1,
+              "text-color": "#ff140f"
+            },
+            'filter': [
+              'all',
+              ['==', '$type', 'Point']
+            ]
+        });
+
+        map.addLayer({
+            "id": "route-label",
+            "type": "symbol",
+            "source": "routes",
+            "layout": {
+                "text-field": '{title}',
+                "text-size": 12,
+                "text-offset": [2,0]
+            },
+            "paint": {
+              "text-halo-color": "#fff",
+              "text-halo-width": 2
+            }
+        });
+
+        map.on('click', function(e) {
+
+          routeLinesJson.features = []
+          routeFromJson.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat]
+          map.getSource('routeFrom').setData(routeFromJson)
+
+          const features = map.queryRenderedFeatures(e.point, {
+                layers: isochroneLayers.map(l=>'i'+l.time)
+            });
+          if(features.length){
+            const stations = [ ...new Set(features.map(f=>f.properties.name)) ]
+            console.log('Stations: '+stations)
+            stations.forEach(station_name => {
+              const stations = map.querySourceFeatures('isochrones', {
+                              sourceLayer: 'destinations',
+                              'filter': [
+                                'all',
+                                ['==', 'name', station_name],
+                                ['==', '$type', 'Point']
+                              ]
+                            })
+              if(stations.length==0) return;
+              fetchRoute({lat:stations[0].geometry.coordinates[1],lng:stations[0].geometry.coordinates[0]})
+
+            });
           }
-      });
 
-      map.on('click', function(e) {
-
-        routeLinesJson.features = []
-        routeFromJson.geometry.coordinates = [e.lngLat.lng, e.lngLat.lat]
-        map.getSource('routeFrom').setData(routeFromJson)
-
-        const features = map.queryRenderedFeatures(e.point, {
-              layers: isochroneLayers.map(l=>'i'+l.time)
-          });
-        if(features.length){
-          const stations = [ ...new Set(features.map(f=>f.properties.name)) ]
-          console.log('Stations: '+stations)
-          stations.forEach(station_name => {
-            const stations = map.querySourceFeatures('isochrones', {
-                            sourceLayer: 'destinations',
-                            'filter': [
-                              'all',
-                              ['==', 'name', station_name],
-                              ['==', '$type', 'Point']
-                            ]
-                          })
-            if(stations.length==0) return;
-            fetchRoute({lat:stations[0].geometry.coordinates[1],lng:stations[0].geometry.coordinates[0]})
-
-          });
-        }
-
-      });
+        });
 
 
 
 
-      function fetchRoute(lngLat) {
-        const query = encodeURIComponent([routeFromJson.geometry.coordinates.join(','),[lngLat.lng, lngLat.lat].join(',')].join(';'));
-        const api = "https://maps.bikeottawa.ca/route/v1/"+document.querySelector('input[name=lts_radios]:checked').value
-        const request = new XMLHttpRequest();
-        request.abort();
-        request.open('GET', api + '/'+ query + '?alternatives=false&steps=true&geometries=geojson', true);
-        request.onload = function () {
-          if (request.status >= 200 && request.status < 400) {
-            var data = JSON.parse(request.responseText);
+        function fetchRoute(lngLat) {
+          const query = encodeURIComponent([routeFromJson.geometry.coordinates.join(','),[lngLat.lng, lngLat.lat].join(',')].join(';'));
+          const api = "https://maps.bikeottawa.ca/route/v1/"+document.querySelector('input[name=lts_radios]:checked').value
+          const request = new XMLHttpRequest();
+          request.abort();
+          request.open('GET', api + '/'+ query + '?alternatives=false&steps=true&geometries=geojson', true);
+          request.onload = function () {
+            if (request.status >= 200 && request.status < 400) {
+              var data = JSON.parse(request.responseText);
 
-            if (data.error) {
+              if (data.error) {
+                return
+              }
+
+              if (data.routes[0]){
+                data.routes[0]['properties'] = {title:buildTitle(data.routes[0].duration, data.routes[0].distance)}
+                data.routes[0].geometry.coordinates.reverse()
+                routeLinesJson.features.push(data.routes[0])
+                map.getSource('routes').setData(routeLinesJson);
+
+              }
+            } else {
               return
             }
+          };
 
-            if (data.routes[0]){
-              data.routes[0]['properties'] = {title:buildTitle(data.routes[0].duration, data.routes[0].distance)}
-              data.routes[0].geometry.coordinates.reverse()
-              routeLinesJson.features.push(data.routes[0])
-              map.getSource('routes').setData(routeLinesJson);
-
-            }
-          } else {
+          request.onerror = function () {
             return
-          }
-        };
+          };
 
-        request.onerror = function () {
-          return
-        };
+          request.send();
+        }
+        function buildTitle(duration, distance){
+          let ret = Math.floor(duration / 60).toString() + ':'+('00'+Math.floor(duration % 60)).slice(-2)
+          ret += '\n'+Math.floor(distance)+'m'
+          return ret
+        }
 
-        request.send();
-      }
-      function buildTitle(duration, distance){
-        let ret = Math.floor(duration / 60).toString() + ':'+('00'+Math.floor(duration % 60)).slice(-2)
-        ret += '\n'+Math.floor(distance)+'m'
-        return ret
-      }
+        function toggleIsochrones() {
 
-      function toggleIsochrones() {
+          routeLinesJson.features = []
+          map.getSource('routes').setData(routeLinesJson);
 
-        routeLinesJson.features = []
-        map.getSource('routes').setData(routeLinesJson);
+          const lts = document.querySelector('input[name=lts_radios]:checked').value
 
-        const lts = document.querySelector('input[name=lts_radios]:checked').value
+          isochroneLayers.forEach((layer, i) => {
+            map.setFilter('i' + layer.time, [
+                                              'all',
+                                              ['==', '$type', 'Polygon'],
+                                              ['<=', 'time', layer.time],
+                                              ['==', 'lts', lts]
+                                            ])
+                                          })
 
-        isochroneLayers.forEach((layer, i) => {
-          map.setFilter('i' + layer.time, [
-                                            'all',
-                                            ['==', '$type', 'Polygon'],
-                                            ['<=', 'time', layer.time],
-                                            ['==', 'lts', lts]
-                                          ])
-                                        })
-
-      }
+        }
 
 
 
-      function toggleLayer (checkbox) {
-        map.setLayoutProperty(checkbox.currentTarget.id, 'visibility', checkbox.currentTarget.checked?'visible':'none');
-      }
+        function toggleLayer (checkbox) {
+          map.setLayoutProperty(checkbox.currentTarget.id, 'visibility', checkbox.currentTarget.checked?'visible':'none');
+        }
 
-      function toggleIsochrone(checkbox){
+        function toggleIsochrone(checkbox){
 
-        const radios = document.getElementsByName('i_radios')
-        radios.forEach(checkbox => map.setLayoutProperty(checkbox.id, 'visibility', checkbox.checked?'visible':'none'))
-      }
+          const radios = document.getElementsByName('i_radios')
+          radios.forEach(checkbox => map.setLayoutProperty(checkbox.id, 'visibility', checkbox.checked?'visible':'none'))
+        }
 
-      document.getElementById('lts1').onchange = toggleIsochrones
-      document.getElementById('lts2').onchange = toggleIsochrones
-      document.getElementById('lts3').onchange = toggleIsochrones
-      document.getElementById('lts4').onchange = toggleIsochrones
-      document.getElementById('legend-lts1').onclick = toggleLayer
-      document.getElementById('legend-lts2').onclick = toggleLayer
-      document.getElementById('legend-lts3').onclick = toggleLayer
-      document.getElementById('legend-lts4').onclick = toggleLayer
-      document.getElementById('i3').onchange = toggleIsochrone
-      document.getElementById('i6').onchange = toggleIsochrone
-      document.getElementById('i9').onchange = toggleIsochrone
-      document.getElementById('i12').onchange = toggleIsochrone
-      document.getElementById('i15').onchange = toggleIsochrone
+        document.getElementById('lts1').onchange = toggleIsochrones
+        document.getElementById('lts2').onchange = toggleIsochrones
+        document.getElementById('lts3').onchange = toggleIsochrones
+        document.getElementById('lts4').onchange = toggleIsochrones
+        document.getElementById('legend-lts1').onclick = toggleLayer
+        document.getElementById('legend-lts2').onclick = toggleLayer
+        document.getElementById('legend-lts3').onclick = toggleLayer
+        document.getElementById('legend-lts4').onclick = toggleLayer
+        document.getElementById('i3').onchange = toggleIsochrone
+        document.getElementById('i6').onchange = toggleIsochrone
+        document.getElementById('i9').onchange = toggleIsochrone
+        document.getElementById('i12').onchange = toggleIsochrone
+        document.getElementById('i15').onchange = toggleIsochrone
 
 
+      });
     });
-
   </script>
 
 </body>
